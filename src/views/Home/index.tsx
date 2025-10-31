@@ -1,10 +1,10 @@
+import Navbar from "../../components/Navbar";
 
-export function Component() {
-
-
-    return (
-        <>jjj</>
-    ) ;
+export default function Home() {
+  return (
+      <>
+      <Navbar/>
+        hello
+      </>
+  );
 }
-
-Component.displayName = 'Home';

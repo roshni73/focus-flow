@@ -1,5 +1,5 @@
 
-export function Component() {
+function Services() {
 
 
     return (
@@ -7,4 +7,4 @@ export function Component() {
     ) ;
 }
 
-Component.displayName = 'Services';
+export default Services;

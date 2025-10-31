@@ -1,68 +1,22 @@
-import { customWrapRoute, rootLayout } from "./common";
-import { unwrapRoute } from "#utils/routes";
-import type { ExtendedProps } from "./common";
+import { createBrowserRouter } from "react-router-dom";
+import { lazy } from "react";
 
-const home = customWrapRoute<ExtendedProps>({
-  parent: rootLayout,
-  path: "/",
-  component: {
-    render: () => import("../views/Home"),
-    props: {},
-  },
-  context: {
-    title: "Home",
-    visibility: "anything",
-  },
-});
+// Only import what you need
+const Home = lazy(() => import("../views/Home"));
+const About = lazy(() => import("../views/About"));
+const Services = lazy(() => import("../views/Services"));
 
-const about = customWrapRoute<ExtendedProps>({
-  parent: rootLayout,
-  path: "about",
-  component: {
-    render: () => import("../views/About"),
-    props: {},
+export const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <Home />,
   },
-  context: {
-    title: "About",
-    visibility: "anything",
+  {
+    path: "/about",
+    element: <About />,
   },
-});
-
-const services = customWrapRoute<ExtendedProps>({
-  parent: rootLayout,
-  path: "services",
-  component: {
-    render: () => import("../views/Services"),
-    props: {},
+  {
+    path: "/services",
+    element: <Services />,
   },
-  context: {
-    title: "Services",
-    visibility: "anything",
-  },
-});
-
-const contact = customWrapRoute<ExtendedProps>({
-  parent: rootLayout,
-  path: "contact",
-  component: {
-    render: () => import("../views/Contact"),
-    props: {},
-  },
-  context: {
-    title: "Contact",
-    visibility: "anything",
-  },
-});
-
-const wrappedRoutes = {
-  rootLayout,
-  home,
-  about,
-  services,
-  contact,
-};
-
-export const unwrappedRoutes = unwrapRoute(Object.values(wrappedRoutes));
-export default wrappedRoutes;
-
-export type WrappedRoutes = typeof wrappedRoutes;
+]);
