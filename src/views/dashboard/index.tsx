@@ -1,174 +1,186 @@
-import { DatePicker, Divider, Tag } from "antd";
-import { RiFolderLine, RiTimeLine } from "react-icons/ri";
-import MonthlyRevenueChart from "./component/monthly-line-chart";
-import ClientSourceBreakdown from "./component/client-source-piechart";
-import AppSecondaryButton from "../../shared/components/button/app-secondary-button";
-import { getCookie } from "../../utils/cookies";
-import clsx from "clsx";
-import { getStatusColor } from "../../utils/helper";
-import {
-  KPI,
-  RECENT_ACTIVITIES,
-  TOP_CLIENTS,
-  USER_KPI,
-} from "./component/mock-data";
+import { useEffect, useState } from 'react';
 
-const Dashboard = () => {
-  const userRole = getCookie("auth_role");
-  const displayKPI = userRole === "user" ? USER_KPI : KPI;
+import { Users, TrendingUp, DollarSign, ShoppingCart, ArrowUp, ArrowDown } from 'lucide-react';
+import { useAuth } from '../../contexts/AuthContext';
+import { Card } from '../../components/card';
+
+
+interface StatCard {
+  title: string;
+  value: string;
+  change: number;
+  icon: React.ElementType;
+  color: string;
+}
+
+interface Activity {
+  action: string;
+  time: string;
+  type: 'user' | 'order' | 'payment' | 'comment';
+}
+
+interface Metric {
+  label: string;
+  value: string;
+  progress: number;
+}
+
+export function Dashboard() {
+  const { user } = useAuth();
+  const [stats, setStats] = useState<StatCard[]>([]);
+
+  useEffect(() => {
+    // Simulate fetching dashboard data
+    const mockStats: StatCard[] = [
+      {
+        title: 'Total Users',
+        value: '2,543',
+        change: 12.5,
+        icon: Users,
+        color: 'bg-blue-500',
+      },
+      {
+        title: 'Revenue',
+        value: '$45,678',
+        change: 8.2,
+        icon: DollarSign,
+        color: 'bg-green-500',
+      },
+      {
+        title: 'Orders',
+        value: '1,234',
+        change: -3.4,
+        icon: ShoppingCart,
+        color: 'bg-purple-500',
+      },
+      {
+        title: 'Growth',
+        value: '23.5%',
+        change: 5.1,
+        icon: TrendingUp,
+        color: 'bg-orange-500',
+      },
+    ];
+
+    setStats(mockStats);
+  }, []);
+
+  const activities: Activity[] = [
+    { action: 'New user registered', time: '2 minutes ago', type: 'user' },
+    { action: 'Order #1234 completed', time: '15 minutes ago', type: 'order' },
+    { action: 'Payment received', time: '1 hour ago', type: 'payment' },
+    { action: 'New comment posted', time: '2 hours ago', type: 'comment' },
+  ];
+
+  const metrics: Metric[] = [
+    { label: 'Conversion Rate', value: '3.24%', progress: 65 },
+    { label: 'Avg. Order Value', value: '$142', progress: 78 },
+    { label: 'Customer Satisfaction', value: '4.8/5', progress: 96 },
+    { label: 'Active Sessions', value: '147', progress: 45 },
+  ];
+
+  const getActivityColor = (type: Activity['type']): string => {
+    const colors = {
+      user: 'bg-blue-500',
+      order: 'bg-purple-500',
+      payment: 'bg-green-500',
+      comment: 'bg-orange-500',
+    };
+    return colors[type];
+  };
+
   return (
-    <div className='py-4 px-2 sm:py-6 sm:px-4 md:py-8 md:px-4'>
-      <p className='font-bold text-xl sm:text-2xl'>Dashboard</p>
-      <Divider />
-      <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4'>
-        {displayKPI.map((value, id) => (
-          <div
-            key={id}
-            className='min-h-full px-3 py-3 sm:px-4 sm:py-4 border border-gray-200 shadow-md rounded-2xl'
-          >
-            <div className='flex item-center justify-between'>
-              <p className='text-base sm:text-lg font-semibold text-text'>
-                {value?.title}
-              </p>
-              <div className='bg-gray-200 p-2 max-h-8 rounded-full text-base sm:text-lg'>
-                {value?.icon}
-              </div>
-            </div>
-            <div className='mt-4 sm:mt-6 md:mt-8 flex flex-col gap-2'>
-              <p className='text-2xl sm:text-3xl md:text-4xl font-semibold'>
-                {value?.value}
-              </p>
-              <div className='text-xs sm:text-sm'>
-                <span className='px-2 py-1 bg-green-100 rounded-2xl'>
-                  {value.metrics}%
-                </span>{" "}
-                increase in {value?.stats}
-              </div>
-            </div>
-          </div>
-        ))}
+    <div className="space-y-6">
+      {/* Welcome Section */}
+      <div>
+        <h1 className="text-2xl font-bold text-gray-900 mb-2">
+          Welcome back, {user?.name}! 👋
+        </h1>
+        <p className="text-gray-600">
+          Here's what's happening with your business today.
+        </p>
       </div>
-      <div className='min-h-full rounded-2xl px-3 py-4 sm:px-6 sm:py-5 md:px-8 md:py-6 space-y-3 sm:space-y-4 border border-gray-200 mt-3 sm:mt-4 shadow-md'>
-        <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0'>
-          <p className='text-base sm:text-lg font-semibold text-text'>
-            {userRole === "admin"
-              ? "Monthly Revenue Growth (in $)"
-              : "Monthly Task Completion"}
-          </p>
-          <DatePicker
-            picker='year'
-            className='w-full sm:w-auto'
-          />
-        </div>
-        <MonthlyRevenueChart />
+
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {stats.map((stat, index) => {
+          const Icon = stat.icon;
+          const isPositive = stat.change > 0;
+
+          return (
+            <Card key={index} className="p-6 hover:shadow-lg transition-shadow">
+              <div className="flex items-start justify-between">
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-gray-600 mb-2">{stat.title}</p>
+                  <p className="text-2xl font-bold text-gray-900 mb-2">{stat.value}</p>
+                  <div className="flex items-center gap-1">
+                    {isPositive ? (
+                      <ArrowUp size={16} className="text-green-500" />
+                    ) : (
+                      <ArrowDown size={16} className="text-red-500" />
+                    )}
+                    <span
+                      className={`text-sm font-medium ${
+                        isPositive ? 'text-green-500' : 'text-red-500'
+                      }`}
+                    >
+                      {Math.abs(stat.change)}%
+                    </span>
+                    <span className="text-sm text-gray-500">vs last month</span>
+                  </div>
+                </div>
+                <div className={`${stat.color} p-3 rounded-lg`}>
+                  <Icon className="text-white" size={24} />
+                </div>
+              </div>
+            </Card>
+          );
+        })}
       </div>
-      <div className='grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4'>
-        <div className='min-h-full rounded-2xl px-3 py-3 sm:px-4 sm:py-4 space-y-3 sm:space-y-4 border border-gray-200 mt-3 sm:mt-4 shadow-md'>
-          <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0'>
-            <p className='text-base sm:text-lg font-semibold text-text'>
-              {userRole === "admin"
-                ? "Client Source Breakdown"
-                : "Project Type Breakdown"}
-            </p>
-            <DatePicker
-              picker='month'
-              className='w-full sm:w-auto'
-            />
+
+      {/* Recent Activity & Quick Stats */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Recent Activity */}
+        <Card className="p-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Activity</h3>
+          <div className="space-y-4">
+            {activities.map((activity, index) => (
+              <div key={index} className="flex items-center gap-3 pb-3 border-b border-gray-200 last:border-0 last:pb-0">
+                <div
+                  className={`w-2 h-2 rounded-full ${getActivityColor(activity.type)}`}
+                />
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-gray-900">{activity.action}</p>
+                  <p className="text-xs text-gray-500">{activity.time}</p>
+                </div>
+              </div>
+            ))}
           </div>
-          <ClientSourceBreakdown />
-        </div>
-        <div className='min-h-full rounded-2xl px-3 py-3 sm:px-4 sm:py-4 space-y-3 sm:space-y-4 border border-gray-200 mt-3 sm:mt-4 shadow-md flex flex-col'>
-          <div className='flex items-center justify-between'>
-            <p className='text-base sm:text-lg font-semibold text-text'>
-              {userRole === "user" ? "Recent Activities" : "Top Clients"}
-            </p>
-          </div>
-          <div className='flex-1 space-y-2 sm:space-y-3'>
-            {userRole === "user"
-              ? RECENT_ACTIVITIES.map((activity) => (
+        </Card>
+
+        {/* Quick Stats */}
+        <Card className="p-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Stats</h3>
+          <div className="space-y-4">
+            {metrics.map((metric, index) => (
+              <div key={index}>
+                <div className="flex justify-between mb-2">
+                  <span className="text-sm font-medium text-gray-600">{metric.label}</span>
+                  <span className="text-sm font-medium text-gray-900">{metric.value}</span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2">
                   <div
-                    key={activity.id}
-                    className='px-3 py-3 sm:px-4 sm:py-3.5 border border-gray-200 rounded-xl hover:cursor-pointer hover:shadow-md hover:border-primary-300 hover:bg-primary-50 transition-all duration-300 group'
-                  >
-                    <div className='flex items-start justify-between gap-3'>
-                      <div className='flex items-start gap-3 flex-1 min-w-0'>
-                        <div className='w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-primary-400 flex items-center justify-center text-white shrink-0 group-hover:scale-110 transition-transform duration-300 shadow-sm mt-0.5'>
-                          <RiFolderLine
-                            size={18}
-                            className='sm:w-5 sm:h-5'
-                          />
-                        </div>
-                        <div className='min-w-0 flex-1 pt-0.5'>
-                          <p className='text-sm sm:text-base font-semibold text-gray-800 group-hover:text-primary-700 transition-colors mb-1 line-clamp-2'>
-                            {activity.title}
-                          </p>
-                          <p className='text-xs sm:text-sm text-gray-500 mb-2 truncate'>
-                            {activity.project}
-                          </p>
-                          <div className='flex items-center gap-2 flex-wrap'>
-                            <Tag
-                              className={clsx(
-                                "px-2 py-0.5 rounded-2xl! text-xs! font-medium! border",
-                                getStatusColor(activity.status)
-                              )}
-                            >
-                              {activity.status}
-                            </Tag>
-                            <div className='flex items-center gap-1 text-xs text-gray-400'>
-                              <RiTimeLine size={14} />
-                              <span>{activity.date}</span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))
-              : TOP_CLIENTS.map((client) => (
-                  <div
-                    key={client.id}
-                    className='px-3 py-2.5 sm:px-4 sm:py-3 border border-gray-200 rounded-xl hover:cursor-pointer hover:shadow-md hover:border-primary-300 hover:bg-primary-50 transition-all duration-300 group'
-                  >
-                    <div className='flex items-center justify-between gap-2'>
-                      <div className='flex items-center gap-2 sm:gap-3 flex-1 min-w-0'>
-                        <div className='w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-primary-400 flex items-center justify-center text-white font-semibold text-xs sm:text-sm group-hover:scale-110 transition-transform duration-300 shadow-sm shrink-0'>
-                          {client.name
-                            .split(" ")
-                            .map((n) => n[0])
-                            .join("")
-                            .toUpperCase()}
-                        </div>
-                        <div className='min-w-0 flex-1'>
-                          <p className='text-sm sm:text-base font-semibold text-gray-800 group-hover:text-primary-700 transition-colors truncate'>
-                            {client.name}
-                          </p>
-                          <p className='text-xs sm:text-sm text-gray-500 truncate'>
-                            {client.company}
-                          </p>
-                        </div>
-                      </div>
-                      <div className='text-right shrink-0'>
-                        <p className='text-xs sm:text-sm font-semibold text-primary-600'>
-                          {client.revenue}
-                        </p>
-                        <p className='text-xs text-gray-400'>Revenue</p>
-                      </div>
-                    </div>
-                  </div>
-                ))}
+                    className="bg-gradient-to-r from-blue-500 to-purple-600 h-2 rounded-full transition-all duration-300"
+                    style={{ width: `${metric.progress}%` }}
+                  />
+                </div>
+              </div>
+            ))}
           </div>
-          <div className='pt-2 border-t border-gray-200'>
-            <AppSecondaryButton
-              variant='link'
-              className='w-full!'
-            >
-              View All
-            </AppSecondaryButton>
-          </div>
-        </div>
+        </Card>
       </div>
     </div>
   );
-};
+}
 
 export default Dashboard;

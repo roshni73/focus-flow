@@ -1,6 +1,6 @@
 import { type ReactNode } from 'react';
-import { useAuthStore } from '../stores/authStores';
 import { Navigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 
 
 interface RoleProtectedRouteProps {
@@ -9,7 +9,7 @@ interface RoleProtectedRouteProps {
 }
 
 const RoleProtectedRoute = ({ children, allowedRoles }: RoleProtectedRouteProps) => {
-  const { user, isAuthenticated } = useAuthStore();
+  const { user, isAuthenticated } = useAuth();
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;

@@ -1,169 +1,166 @@
-// views/login.tsx
-import { useState, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
+import { Eye, EyeOff, Lock, Mail } from 'lucide-react';
 
-import { Checkbox, Tooltip } from "antd";
-import { InfoCircleOutlined, EyeInvisibleOutlined, EyeTwoTone } from "@ant-design/icons";
+import { useAuth } from '../../contexts/AuthContext';
+import { Label } from '../../components/label';
+import { Input } from '../../components/input';
+import { Button } from '../../components/button';
+import { Separator } from '../../components/separator';
 
-import { useAuthStore } from "../../stores/authStores";
-import AppInput from "../../components/input/app-input";
-import AppButton from "../../components/button/app-button";
-
-const Login = () => {
-  const navigate = useNavigate();
-  const { login, isLoading, error, clearError, isAuthenticated } = useAuthStore();
-  const [isChecked, setIsChecked] = useState(false);
+const LoginPage: React.FC = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
+  const [isLoading, setIsLoading] = useState(false);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
 
-  useEffect(() => {
-    if (isAuthenticated) {
-      navigate("/app/dashboard");
+  const { login, loginWithGoogle } = useAuth();
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    try {
+      const success = await login(email, password);
+
+      if (success) {
+        toast.success('Login successful!');
+        navigate('/admin/dashboard');
+      } else {
+        toast.error('Invalid credentials. Please try again.');
+      }
+    } catch {
+      toast.error('An error occurred. Please try again.');
+    } finally {
+      setIsLoading(false);
     }
-  }, [isAuthenticated, navigate]);
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-    if (error) clearError();
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const success = await login(formData.email, formData.password);
-    if (success) {
-      navigate("/app/dashboard");
+  const handleGoogleLogin = async () => {
+    setIsGoogleLoading(true);
+
+    try {
+      const success = await loginWithGoogle();
+
+      if (success) {
+        toast.success('Successfully signed in with Google!');
+        navigate('/admin/dashboard');
+      } else {
+        toast.error('Google sign-in failed. Please try again.');
+      }
+    } catch {
+      toast.error('An error occurred. Please try again.');
+    } finally {
+      setIsGoogleLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-indigo-50 flex items-center justify-center p-4">
-      <div className="max-w-md w-full">
-        <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-8">
-          {/* Header */}
-          <div className="text-center mb-8">
-            <div className="flex justify-center mb-6">
-              <span className="text-3xl font-bold text-indigo-600">Focus Flow</span>
-            </div>
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">
-              Welcome Back
-            </h1>
-            <p className="text-gray-600 text-sm">
-              Sign in to your account to continue
-            </p>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center p-4">
+      <div className="w-full max-w-md">
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl mb-4">
+            <Lock className="text-white" size={32} />
           </div>
-
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Form Fields */}
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Email Address
-                </label>
-                <div className="relative">
-                  <AppInput
-                    name="email"
-                    type="email"
-                    required
-                    value={formData.email}
-                    onChange={handleChange}
-                    placeholder="Enter your email"
-                    className="w-full pl-3 pr-10 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+          <h1 className="text-gray-900 mb-2 text-xl font-semibold">Welcome Back</h1>
+          <p className="text-gray-600 text-sm">Sign in to access your dashboard</p>
+        </div>
+        <div className="bg-white rounded-2xl shadow-xl p-8 space-y-6">
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full h-11 flex items-center justify-center gap-2"
+            onClick={handleGoogleLogin}
+            disabled={isGoogleLoading || isLoading}
+          >
+            {isGoogleLoading ? (
+              <>
+                <div className="w-5 h-5 border-2 border-gray-300 border-t-blue-500 rounded-full animate-spin" />
+                Signing in with Google...
+              </>
+            ) : (
+              <>
+                <svg className="w-5 h-5" viewBox="0 0 24 24">
+                  <path
+                    fill="#4285F4"
+                    d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
                   />
-                  <Tooltip title="Admin: admin@example.com | Viewer: viewer@example.com">
-                    <InfoCircleOutlined className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 cursor-pointer" />
-                  </Tooltip>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Password
-                </label>
-                <div className="relative">
-                  <AppInput
-                    name="password"
-                    type={showPassword ? "text" : "password"}
-                    required
-                    value={formData.password}
-                    onChange={handleChange}
-                    placeholder="Enter your password"
-                    className="w-full pl-3 pr-10 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                  <path
+                    fill="#34A853"
+                    d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
                   />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                  >
-                    {showPassword ? <EyeTwoTone /> : <EyeInvisibleOutlined />}
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            {/* Remember Me & Forgot Password */}
-            <div className="flex items-center justify-between">
-              <Checkbox
-                checked={isChecked}
-                onChange={(e) => setIsChecked(e.target.checked)}
-                className="flex items-start"
-              >
-                <span className="text-sm text-gray-600 ml-2">
-                  Remember me
-                </span>
-              </Checkbox>
-
-              <Link
-                to="/forgot-password"
-                className="text-sm text-indigo-600 hover:text-indigo-500 font-medium"
-              >
-                Forgot password?
-              </Link>
-            </div>
-
-            {/* Error Message */}
-            {error && (
-              <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-sm">
-                {error}
-              </div>
+                  <path
+                    fill="#FBBC05"
+                    d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                  />
+                  <path
+                    fill="#EA4335"
+                    d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                  />
+                </svg>
+                Continue with Google
+              </>
             )}
-
-            {/* Login Button */}
-            <AppButton
-              className="w-full py-3 rounded-lg font-semibold text-white bg-indigo-600 hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors duration-200"
-              htmlType="submit"
-              loading={isLoading}
-              disabled={!isChecked || isLoading}
-            >
-              {isLoading ? "Signing in..." : "Sign In"}
-            </AppButton>
-          </form>
-
-          {/* Demo Credentials */}
-          <div className="mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
-            <h3 className="text-sm font-semibold text-gray-800 mb-3 text-center">
-              Demo Credentials
-            </h3>
-            <div className="grid grid-cols-1 gap-2 text-xs">
-              <div className="flex justify-between items-center p-2 bg-white rounded border">
-                <span className="text-gray-600">Admin:</span>
-                <code className="text-indigo-600 font-mono">admin@example.com</code>
-              </div>
-              <div className="flex justify-between items-center p-2 bg-white rounded border">
-                <span className="text-gray-600">Viewer:</span>
-                <code className="text-indigo-600 font-mono">viewer@example.com</code>
-              </div>
-              <div className="flex justify-between items-center p-2 bg-white rounded border">
-                <span className="text-gray-600">Password:</span>
-                <code className="text-indigo-600 font-mono">password123</code>
+          </Button>
+          <div className="relative">
+            <Separator />
+            <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-white px-2 text-sm text-gray-500">
+              Or continue with email
+            </span>
+          </div>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-1">
+              <Label htmlFor="email">Email Address</Label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+                <Input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="admin@example.com"
+                  className="pl-10"
+                  required
+                />
               </div>
             </div>
+            <div className="space-y-1">
+              <Label htmlFor="password">Password</Label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+                <Input
+                  id="password"
+                  type={showPassword ? 'text' : 'password'}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Enter your password"
+                  className="pl-10 pr-10"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                >
+                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </button>
+              </div>
+            </div>
+            <Button
+              type="submit"
+              className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
+              disabled={isLoading}
+            >
+              {isLoading ? 'Signing in...' : 'Sign In'}
+            </Button>
+          </form>
+          <div className="mt-6 p-4 bg-blue-50 rounded-lg text-sm text-gray-700 space-y-1">
+            <p className="font-medium">Demo Credentials:</p>
+            <p><span className="font-medium">Admin:</span> admin@example.com / password123</p>
+            <p><span className="font-medium">Viewer:</span> viewer@example.com / password123</p>
           </div>
         </div>
       </div>
@@ -171,4 +168,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default LoginPage;
