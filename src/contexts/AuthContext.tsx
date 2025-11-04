@@ -1,4 +1,10 @@
-import { createContext, useState, useEffect, useContext, type ReactNode } from 'react';
+import {
+  createContext,
+  useState,
+  useEffect,
+  useContext,
+  type ReactNode,
+ } from 'react';
 
 export type UserRole = 'admin' | 'viewer';
 
@@ -63,6 +69,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const mockUser = MOCK_USERS[email as keyof typeof MOCK_USERS];
 
     if (mockUser && mockUser.password === password) {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { password: _, ...userWithoutPassword } = mockUser;
       setUser(userWithoutPassword);
       setNeedsRoleSelection(false);

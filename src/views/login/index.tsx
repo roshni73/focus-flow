@@ -39,7 +39,7 @@ const LoginPage: React.FC = () => {
       } else {
         toast.error('Invalid credentials. Please try again.');
       }
-    } catch (error) {
+    } catch {
       toast.error('An error occurred. Please try again.');
     } finally {
       setIsLoading(false);
@@ -54,12 +54,11 @@ const LoginPage: React.FC = () => {
 
       if (success) {
         toast.success('Google authentication successful!');
-        // Redirect to role selection for Google login
         navigate('/role-selection');
       } else {
         toast.error('Google sign-in failed. Please try again.');
       }
-    } catch (error) {
+    } catch {
       toast.error('An error occurred. Please try again.');
     } finally {
       setIsGoogleLoading(false);

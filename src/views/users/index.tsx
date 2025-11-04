@@ -42,7 +42,7 @@ export function UsersTable() {
   const usersPerPage = 8;
 
   useEffect(() => {
-    fetchUsers();
+    fetchUsers(false); // Don't show toast on initial load
   }, []);
 
   useEffect(() => {
@@ -57,14 +57,16 @@ export function UsersTable() {
     setCurrentPage(1);
   }, [searchTerm, users]);
 
-  const fetchUsers = async () => {
+  const fetchUsers = async (showToast = true) => {
     try {
       setIsLoading(true);
       const response = await fetch('https://jsonplaceholder.typicode.com/users');
       const data = await response.json();
       setUsers(data);
       setFilteredUsers(data);
-      toast.success('Users loaded successfully');
+      if (showToast) {
+        toast.success('Users loaded successfully');
+      }
     } catch (error) {
       console.error('Error fetching users:', error);
       toast.error('Failed to fetch users');
@@ -97,7 +99,6 @@ export function UsersTable() {
   const currentUsers = filteredUsers.slice(indexOfFirstUser, indexOfLastUser);
   const totalPages = Math.ceil(filteredUsers.length / usersPerPage);
 
-
   const getVisiblePages = () => {
     const totalVisiblePages = 5;
     let startPage = Math.max(1, currentPage - Math.floor(totalVisiblePages / 2));
@@ -120,7 +121,7 @@ export function UsersTable() {
         <div className="flex gap-2">
           <Button
             variant="outline"
-            onClick={fetchUsers}
+            onClick={() => fetchUsers(true)} // Show toast on refresh
             disabled={isLoading}
             className="flex items-center gap-2"
           >
@@ -175,6 +176,7 @@ export function UsersTable() {
                           </div>
                           <div>
                             <p className="font-medium text-gray-700">{user.name}</p>
+                            <p className="text-sm text-gray-500">{user.email}</p>
                           </div>
                         </div>
                       </TableCell>
