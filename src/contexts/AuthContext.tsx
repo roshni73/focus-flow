@@ -7,19 +7,21 @@ export interface User {
   name: string;
   role: UserRole;
   avatar?: string;
+  loginMethod?: 'email' | 'google';
 }
 
 interface AuthContextType {
   user: User | null;
   login: (email: string, password: string) => Promise<boolean>;
   loginWithGoogle: () => Promise<boolean>;
+  setUserRole: (role: UserRole) => void;
   logout: () => void;
   isAuthenticated: boolean;
+  needsRoleSelection: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Mock users
 const MOCK_USERS = {
   'admin@example.com': {
     email: 'admin@example.com',
@@ -27,6 +29,7 @@ const MOCK_USERS = {
     name: 'Admin User',
     role: 'admin' as UserRole,
     avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Admin',
+    loginMethod: 'email' as const,
   },
   'viewer@example.com': {
     email: 'viewer@example.com',
@@ -34,21 +37,26 @@ const MOCK_USERS = {
     name: 'Viewer User',
     role: 'viewer' as UserRole,
     avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Viewer',
+    loginMethod: 'email' as const,
   },
 };
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const [needsRoleSelection, setNeedsRoleSelection] = useState(false);
 
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
-      setUser(JSON.parse(storedUser));
+      const userData = JSON.parse(storedUser);
+      setUser(userData);
+      if (userData.loginMethod === 'google' && !userData.role) {
+        setNeedsRoleSelection(true);
+      }
     }
   }, []);
 
   const login = async (email: string, password: string): Promise<boolean> => {
-    // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 1000));
 
     const mockUser = MOCK_USERS[email as keyof typeof MOCK_USERS];
@@ -56,6 +64,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (mockUser && mockUser.password === password) {
       const { password: _, ...userWithoutPassword } = mockUser;
       setUser(userWithoutPassword);
+      setNeedsRoleSelection(false);
       localStorage.setItem('user', JSON.stringify(userWithoutPassword));
       return true;
     }
@@ -64,7 +73,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const loginWithGoogle = async (): Promise<boolean> => {
-    // Simulate Google login
     await new Promise(resolve => setTimeout(resolve, 1500));
 
     const googleUser: User = {
@@ -72,15 +80,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       name: 'Google User',
       role: 'viewer',
       avatar: 'https://lh3.googleusercontent.com/a/default-user',
+      loginMethod: 'google',
     };
 
     setUser(googleUser);
+    setNeedsRoleSelection(true);
     localStorage.setItem('user', JSON.stringify(googleUser));
     return true;
   };
 
+  const setUserRole = (role: UserRole) => {
+    if (user) {
+      const updatedUser = { ...user, role };
+      setUser(updatedUser);
+      setNeedsRoleSelection(false);
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+    }
+  };
+
   const logout = () => {
     setUser(null);
+    setNeedsRoleSelection(false);
     localStorage.removeItem('user');
   };
 
@@ -90,8 +110,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         user,
         login,
         loginWithGoogle,
+        setUserRole,
         logout,
-        isAuthenticated: !!user,
+        isAuthenticated: !!user && !needsRoleSelection,
+        needsRoleSelection,
       }}
     >
       {children}

@@ -47,17 +47,13 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
 
   return (
     <>
-      {/* Mobile overlay */}
       <div
         className={`fixed inset-0 bg-black/50 lg:hidden z-40 transition-opacity ${overlayClass}`}
         onClick={onToggle}
       />
-
-      {/* Sidebar */}
       <aside
         className={`fixed lg:relative inset-y-0 left-0 z-50 bg-white border-r border-gray-200 transition-all duration-300 flex flex-col ${sidebarClass}`}
       >
-        {/* Logo & Toggle */}
         <div className="h-16 border-b border-gray-200 flex items-center justify-between px-4">
           {!collapsed && (
             <div className="flex items-center gap-2">
@@ -74,8 +70,6 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
             {collapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
           </button>
         </div>
-
-        {/* Navigation */}
         <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
           {filteredNavItems.map((item) => (
             <NavLink
@@ -96,8 +90,6 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
             </NavLink>
           ))}
         </nav>
-
-        {/* User & Logout */}
         <div className="p-4 border-t border-gray-200 space-y-2">
           {!collapsed && user && (
             <div className="px-4 py-2 mb-2">
