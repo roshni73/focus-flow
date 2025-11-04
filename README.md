@@ -47,6 +47,33 @@ pnpm dev
 ```
 
 4. Open [http://localhost:3000](http://localhost:3000) in your browser
+## Docker Support
+
+### Prerequisites
+- Docker installed on your system
+- Docker Buildx (for multi-platform builds)
+
+### Building and Running with Docker
+
+1. Build the Docker image using Buildx:
+```bash
+docker buildx build -t focus-flow .
+```
+
+2. Run the container:
+```bash
+docker run -p 3000:80 focus-flow
+```
+
+The application will be available at http://localhost:3000
+
+### Docker Commands
+
+- Build multi-platform image: `docker buildx build --platform linux/amd64,linux/arm64 -t focus-flow .`
+- Run container: `docker run -p 3000:80 focus-flow`
+- Stop container: `docker stop focus-flow`
+- Remove container: `docker rm focus-flow`
+- Remove image: `docker rmi focus-flow`
 
 ## Available Scripts
 
@@ -89,34 +116,6 @@ src/
 - Performance tracking
 - Data visualization
 - Progress metrics
-
-## Docker Support
-
-### Prerequisites
-- Docker installed on your system
-- Docker Buildx (for multi-platform builds)
-
-### Building and Running with Docker
-
-1. Build the Docker image using Buildx:
-```bash
-docker buildx build -t focus-flow .
-```
-
-2. Run the container:
-```bash
-docker run -p 3000:80 focus-flow
-```
-
-The application will be available at http://localhost:3000
-
-### Docker Commands
-
-- Build multi-platform image: `docker buildx build --platform linux/amd64,linux/arm64 -t focus-flow .`
-- Run container: `docker run -p 3000:80 focus-flow`
-- Stop container: `docker stop focus-flow`
-- Remove container: `docker rm focus-flow`
-- Remove image: `docker rmi focus-flow`
 
 ## Contributing
 
