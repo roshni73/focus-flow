@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { toast } from 'sonner';
-import { Eye, EyeOff, Lock, Mail } from 'lucide-react';
+import { Eye, EyeOff, Lock, Mail, Home } from 'lucide-react';
 
 import { useAuth } from '../../contexts/AuthContext';
 import { Label } from '../../components/label';
@@ -68,6 +68,14 @@ const LoginPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center p-4">
+      <Link
+        to="/"
+        className="absolute top-6 left-6 flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors duration-200 group"
+      >
+        <Home size={20} className="group-hover:scale-110 transition-transform" />
+        <span className="font-medium">Back to Home</span>
+      </Link>
+
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl mb-4">
@@ -164,7 +172,7 @@ const LoginPage: React.FC = () => {
               )}
             </Button>
           </form>
-          <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+          <div className="mt-6 p-3 bg-blue-50 rounded-lg border border-blue-200">
             <p className="font-medium text-blue-900 text-sm mb-2">Demo Credentials:</p>
             <div className="space-y-1 text-sm">
               <p className="text-blue-800">

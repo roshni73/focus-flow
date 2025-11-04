@@ -23,7 +23,7 @@ const footerLinks = {
   const Footer = () => {
     return (
       <>
-        <footer className='bg-dark text-white px-8 md:px-16 lg:px-32 py-16'>
+        <footer id="footer" className='bg-dark text-white px-8 md:px-16 lg:px-32 py-16'>
           <div className='max-w-[1440px] mx-auto flex flex-col lg:flex-row justify-between gap-12'>
             <div className='space-y-4 max-w-md'>
               <p className='font-bold text-3xl'>Focusflow.</p>

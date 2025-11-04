@@ -92,13 +92,12 @@ export function UsersTable() {
     toast.info(`Editing user: ${user.name}`);
   };
 
-  // Pagination calculations
   const indexOfLastUser = currentPage * usersPerPage;
   const indexOfFirstUser = indexOfLastUser - usersPerPage;
   const currentUsers = filteredUsers.slice(indexOfFirstUser, indexOfLastUser);
   const totalPages = Math.ceil(filteredUsers.length / usersPerPage);
 
-  // Get visible page numbers for pagination
+
   const getVisiblePages = () => {
     const totalVisiblePages = 5;
     let startPage = Math.max(1, currentPage - Math.floor(totalVisiblePages / 2));
@@ -113,7 +112,6 @@ export function UsersTable() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-3xl font-bold text-gray-700">Users Management</h1>
@@ -132,7 +130,6 @@ export function UsersTable() {
         </div>
       </div>
 
-      {/* Search and Stats */}
       <Card className="p-6 bg-white/50 backdrop-blur-sm border border-gray-200/50">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
           <div className="relative flex-1 max-w-md">
@@ -157,13 +154,12 @@ export function UsersTable() {
           </div>
         ) : (
           <>
-            {/* Users Table */}
             <div className="overflow-x-auto rounded-lg border border-gray-200/50">
               <Table>
                 <TableHeader>
                   <TableRow className="bg-gray-50/50">
                     <TableHead className="text-gray-600 font-semibold">User</TableHead>
-                    <TableHead className="text-gray-600 font-semibold">Contact</TableHead>
+                    <TableHead className="text-gray-600 font-semibold">Phone</TableHead>
                     <TableHead className="text-gray-600 font-semibold">Company</TableHead>
                     <TableHead className="text-gray-600 font-semibold">Location</TableHead>
                     <TableHead className="text-gray-600 font-semibold text-right">Actions</TableHead>
@@ -179,24 +175,13 @@ export function UsersTable() {
                           </div>
                           <div>
                             <p className="font-medium text-gray-700">{user.name}</p>
-                            <p className="text-sm text-gray-500">ID: {user.id}</p>
                           </div>
                         </div>
                       </TableCell>
                       <TableCell>
-                        <div className="space-y-1">
-                          <div className="flex items-center gap-2 text-gray-600">
-                            <Mail size={14} />
-                            <span className="text-sm">{user.email}</span>
-                          </div>
-                          <div className="flex items-center gap-2 text-gray-600">
-                            <Phone size={14} />
-                            <span className="text-sm">{user.phone}</span>
-                          </div>
-                          <div className="flex items-center gap-2 text-gray-600">
-                            <Globe size={14} />
-                            <span className="text-sm">{user.website}</span>
-                          </div>
+                        <div className="flex items-center gap-2 text-gray-600">
+                          <Phone size={16} />
+                          <span className="text-sm">{user.phone}</span>
                         </div>
                       </TableCell>
                       <TableCell>
@@ -251,8 +236,6 @@ export function UsersTable() {
                 </TableBody>
               </Table>
             </div>
-
-            {/* Empty State */}
             {filteredUsers.length === 0 && !isLoading && (
               <div className="text-center py-12">
                 <div className="text-gray-400 mb-4">
@@ -262,8 +245,6 @@ export function UsersTable() {
                 <p className="text-gray-500">Try adjusting your search terms</p>
               </div>
             )}
-
-            {/* Pagination */}
             {totalPages > 1 && (
               <div className="flex flex-col sm:flex-row items-center justify-between mt-6 gap-4">
                 <p className="text-sm text-gray-500">
@@ -306,8 +287,6 @@ export function UsersTable() {
           </>
         )}
       </Card>
-
-      {/* Delete Confirmation Modal */}
       {deleteUserId && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg p-6 max-w-md w-full">
@@ -333,8 +312,6 @@ export function UsersTable() {
           </div>
         </div>
       )}
-
-      {/* View User Details Modal */}
       {viewUserId && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
@@ -356,7 +333,6 @@ export function UsersTable() {
 
               return (
                 <div className="space-y-6">
-                  {/* User Basic Info */}
                   <div className="flex items-center gap-4">
                     <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
                       <User className="text-white" size={24} />
@@ -368,7 +344,6 @@ export function UsersTable() {
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {/* Contact Information */}
                     <div className="space-y-4">
                       <h5 className="font-semibold text-gray-700">Contact Information</h5>
                       <div className="space-y-2">
@@ -386,8 +361,6 @@ export function UsersTable() {
                         </div>
                       </div>
                     </div>
-
-                    {/* Company Information */}
                     <div className="space-y-4">
                       <h5 className="font-semibold text-gray-700">Company</h5>
                       <div className="space-y-2">
@@ -396,8 +369,6 @@ export function UsersTable() {
                         <p className="text-sm text-gray-500">{user.company.bs}</p>
                       </div>
                     </div>
-
-                    {/* Address Information */}
                     <div className="space-y-4">
                       <h5 className="font-semibold text-gray-700">Address</h5>
                       <div className="space-y-1 text-gray-600">

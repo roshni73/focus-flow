@@ -42,19 +42,20 @@ const MOCK_USERS = {
 };
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<User | null>(() => {
+    const storedUser = localStorage.getItem('user');
+    return storedUser ? JSON.parse(storedUser) : null;
+  });
+
   const [needsRoleSelection, setNeedsRoleSelection] = useState(false);
 
   useEffect(() => {
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      const userData = JSON.parse(storedUser);
-      setUser(userData);
-      if (userData.loginMethod === 'google' && !userData.role) {
-        setNeedsRoleSelection(true);
-      }
+    if (user?.loginMethod === 'google' && !user.role) {
+      setNeedsRoleSelection(true);
+    } else {
+      setNeedsRoleSelection(false);
     }
-  }, []);
+  }, [user]);
 
   const login = async (email: string, password: string): Promise<boolean> => {
     await new Promise(resolve => setTimeout(resolve, 1000));

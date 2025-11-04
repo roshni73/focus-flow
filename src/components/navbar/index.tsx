@@ -8,10 +8,9 @@ import { Button } from "../../components/button";
 const navigation = [
   { name: 'Home', href: '/' },
   { name: 'About Us', href: '#about' },
-  { name: 'Resources', href: '#resources' },
+  { name: 'Resources', href: '#footer' },
   { name: 'News', href: '#news' },
 ];
-
 export function Navbar() {
   const location = useLocation();
   const navigate = useNavigate();
