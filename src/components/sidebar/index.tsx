@@ -1,136 +1,130 @@
-import React from 'react';
-import { useAuth } from '../../contexts/AuthContext';
+import { NavLink, useNavigate } from 'react-router-dom';
 
-import { useNavigate, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard,
   Users,
-  Settings,
   BarChart3,
-  FileText,
-  User
+  UserCircle,
+  LogOut,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
-import clsx from 'clsx';
+import { useAuth } from '../../contexts/AuthContext';
 
-interface MenuItem {
-  id: string;
-  label: string;
-  icon: React.ReactNode;
-  path: string;
-  roles: string[];
+interface SidebarProps {
+  collapsed: boolean;
+  onToggle: () => void;
 }
 
-const Sidebar: React.FC = () => {
+export function Sidebar({ collapsed, onToggle }: SidebarProps) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const location = useLocation();
-
-  const menuItems: MenuItem[] = [
-    {
-      id: 'dashboard',
-      label: 'Dashboard',
-      icon: <LayoutDashboard size={20} />,
-      path: '/admin/dashboard',
-      roles: ['admin', 'viewer']
-    },
-    {
-      id: 'analytics',
-      label: 'Analytics',
-      icon: <BarChart3 size={20} />,
-      path: '/admin/analytics',
-      roles: ['admin', 'viewer']
-    },
-    {
-      id: 'profile',
-      label: 'My Profile',
-      icon: <User size={20} />,
-      path: '/admin/profile',
-      roles: ['admin', 'viewer']
-    },
-    {
-      id: 'users',
-      label: 'User Management',
-      icon: <Users size={20} />,
-      path: '/admin/users',
-      roles: ['admin']
-    },
-    {
-      id: 'content',
-      label: 'Content Management',
-      icon: <FileText size={20} />,
-      path: '/admin/content',
-      roles: ['admin']
-    },
-    {
-      id: 'settings',
-      label: 'System Settings',
-      icon: <Settings size={20} />,
-      path: '/admin/settings',
-      roles: ['admin']
-    },
-  ];
-
-  const filteredMenuItems = menuItems.filter(item =>
-    item.roles.includes(user?.role || 'viewer')
-  );
-
-  const handleNavigation = (path: string) => {
-    navigate(path);
-  };
 
   const handleLogout = () => {
     logout();
-    navigate('/');
+    navigate('/login');
   };
 
-  return (
-    <div className="w-64 bg-white border-r border-gray-200 h-screen flex flex-col">
-      <div className="p-6 border-b border-gray-200">
-        <div className="flex items-center gap-3 mb-2">
-          <img
-            src={user?.avatar}
-            alt={user?.name}
-            className="w-10 h-10 rounded-full"
-          />
-          <div>
-            <h2 className="font-semibold text-gray-900">{user?.name}</h2>
-            <p className="text-sm text-gray-500 capitalize">{user?.role}</p>
-          </div>
-        </div>
-      </div>
-      <nav className="flex-1 p-4">
-        <ul className="space-y-2">
-          {filteredMenuItems.map((item) => (
-            <li key={item.id}>
-              <button
-                onClick={() => handleNavigation(item.path)}
-                className={clsx(
-                  "w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-colors duration-200",
-                  location.pathname === item.path
-                    ? "bg-blue-50 text-blue-700 border border-blue-200"
-                    : "text-gray-700 hover:bg-gray-50 hover:text-gray-900"
-                )}
-              >
-                {item.icon}
-                <span className="font-medium">{item.label}</span>
-              </button>
-            </li>
-          ))}
-        </ul>
-      </nav>
-      <div className="p-4 border-t border-gray-200">
-        <button
-          onClick={handleLogout}
-          className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-red-600 hover:bg-red-50 transition-colors duration-200"
-        >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-          </svg>
-          <span className="font-medium">Logout</span>
-        </button>
-      </div>
-    </div>
-  );
-};
+  const navItems = [
+    { to: '/admin/dashboard', icon: LayoutDashboard, label: 'Dashboard', roles: ['admin', 'viewer'] },
+    { to: '/admin/users', icon: Users, label: 'Users', roles: ['admin'] },
+    { to: '/admin/charts', icon: BarChart3, label: 'Charts', roles: ['admin', 'viewer'] },
+    { to: '/admin/profile', icon: UserCircle, label: 'Profile', roles: ['admin', 'viewer'] },
+  ];
 
-export default Sidebar;
+  const filteredNavItems = navItems.filter(item =>
+    user?.role && item.roles.includes(user.role)
+  );
+
+  // Simple conditional class names without cn
+  const overlayClass = collapsed
+    ? "opacity-0 pointer-events-none"
+    : "opacity-100";
+
+  const sidebarClass = collapsed
+    ? "-translate-x-full lg:translate-x-0 w-0 lg:w-20"
+    : "w-64";
+
+  return (
+    <>
+      {/* Mobile overlay */}
+      <div
+        className={`fixed inset-0 bg-black/50 lg:hidden z-40 transition-opacity ${overlayClass}`}
+        onClick={onToggle}
+      />
+
+      {/* Sidebar */}
+      <aside
+        className={`fixed lg:relative inset-y-0 left-0 z-50 bg-white border-r border-gray-200 transition-all duration-300 flex flex-col ${sidebarClass}`}
+      >
+        {/* Logo & Toggle */}
+        <div className="h-16 border-b border-gray-200 flex items-center justify-between px-4">
+          {!collapsed && (
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                <span className="text-white text-sm font-semibold">F</span>
+              </div>
+              <span className="font-semibold">FocusFlow</span>
+            </div>
+          )}
+          <button
+            onClick={onToggle}
+            className="hidden lg:flex p-2 hover:bg-gray-100 rounded-lg transition-colors"
+          >
+            {collapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
+          </button>
+        </div>
+
+        {/* Navigation */}
+        <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
+          {filteredNavItems.map((item) => (
+            <NavLink
+              key={item.to}
+              to={item.to}
+              className={({ isActive }) => {
+                const baseClasses = "flex items-center gap-3 px-4 py-3 rounded-lg transition-colors";
+                const activeClasses = isActive
+                  ? "bg-blue-50 text-blue-600 border border-blue-200"
+                  : "text-gray-700 hover:bg-gray-100 hover:text-gray-900";
+                const collapsedClass = collapsed ? "justify-center" : "";
+
+                return `${baseClasses} ${activeClasses} ${collapsedClass}`;
+              }}
+            >
+              <item.icon size={20} />
+              {!collapsed && <span className="font-medium">{item.label}</span>}
+            </NavLink>
+          ))}
+        </nav>
+
+        {/* User & Logout */}
+        <div className="p-4 border-t border-gray-200 space-y-2">
+          {!collapsed && user && (
+            <div className="px-4 py-2 mb-2">
+              <div className="flex items-center gap-3">
+                <img
+                  src={user.avatar}
+                  alt={user.name}
+                  className="w-10 h-10 rounded-full"
+                />
+                <div className="flex-1 min-w-0">
+                  <p className="font-medium truncate text-sm">{user.name}</p>
+                  <p className="text-gray-500 text-xs capitalize">{user.role}</p>
+                </div>
+              </div>
+            </div>
+          )}
+          <button
+            onClick={handleLogout}
+            className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors text-red-600 hover:bg-red-50 w-full ${
+              collapsed ? "justify-center" : ""
+            }`}
+          >
+            <LogOut size={20} />
+            {!collapsed && <span className="font-medium">Logout</span>}
+          </button>
+        </div>
+      </aside>
+    </>
+  );
+}

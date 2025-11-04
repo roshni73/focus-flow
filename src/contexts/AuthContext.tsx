@@ -48,12 +48,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const login = async (email: string, password: string): Promise<boolean> => {
-    await new Promise(resolve => setTimeout(resolve, 500));
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 1000));
 
     const mockUser = MOCK_USERS[email as keyof typeof MOCK_USERS];
 
     if (mockUser && mockUser.password === password) {
-      const userWithoutPassword = { ...mockUser, password: undefined };
+      const { password: _, ...userWithoutPassword } = mockUser;
       setUser(userWithoutPassword);
       localStorage.setItem('user', JSON.stringify(userWithoutPassword));
       return true;
@@ -63,12 +64,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const loginWithGoogle = async (): Promise<boolean> => {
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    // Simulate Google login
+    await new Promise(resolve => setTimeout(resolve, 1500));
 
     const googleUser: User = {
-      email: 'user@gmail.com',
+      email: 'googleuser@example.com',
       name: 'Google User',
-      role: 'admin',
+      role: 'viewer',
       avatar: 'https://lh3.googleusercontent.com/a/default-user',
     };
 
@@ -96,6 +98,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     </AuthContext.Provider>
   );
 }
+
 // eslint-disable-next-line react-refresh/only-export-components
 export function useAuth(): AuthContextType {
   const context = useContext(AuthContext);

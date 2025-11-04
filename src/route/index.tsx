@@ -1,57 +1,43 @@
 import { createBrowserRouter } from "react-router-dom";
 import { lazy } from "react";
+import ProtectedRoute from "../components/protectedRoute";
+import DashboardLayout from "../layout/dashboardLayout";
 
-
-
+// Public routes
 const Login = lazy(() => import("../views/login"));
-
-// const UserTable = lazy(() => import("../views/user-table/user-table-page"));
-// const Profile = lazy(() => import("../views/profile"));
-
 const Home = lazy(() => import("../views/home"));
-const AboutUs = lazy(() => import("../views/about"));
-const NewsPage = lazy(() => import("../views/news"));
+
+// Dashboard routes
+const Dashboard = lazy(() => import("../views/dashboard"));
+const Profile = lazy(() => import("../views/profile"));
+const Charts = lazy(() => import("../views/charts"));
+const UserManagement = lazy(() => import("../views/users"));
 
 export const router = createBrowserRouter([
   {
     path: "/",
     element: <Home />,
-    children: [
-      { index: true, element: <Home /> },
-      { path: "about-us", element: <AboutUs /> },
-      { path: "news", element: <NewsPage /> },
-    ],
   },
   {
     path: "/login",
     element: <Login />,
   },
-
-  // {
-  //   path: "/app",
-  //   element: <AppLayout />,
-  //   children: [
-  //     { index: true, element: <Dashboard /> },
-  //     { path: "dashboard", element: <Dashboard /> },
-  //     {
-  //       path: "chart-page",
-  //       element: (
-  //         <RoleProtectedRoute allowedRoles={["admin"]}>
-  //           <ChartPage />
-  //         </RoleProtectedRoute>
-  //       ),
-  //     },
-  //     {
-  //       path: "user-table",
-  //       element: (
-  //         <RoleProtectedRoute allowedRoles={["admin"]}>
-  //           <UserTable />
-  //         </RoleProtectedRoute>
-  //       )
-  //     },
-  //     { path: "profile", element: <Profile /> },
-  //   ],
-  // },
+  // Protected dashboard routes
+  {
+    path: "/admin",
+    element: (
+      <ProtectedRoute>
+        <DashboardLayout />
+      </ProtectedRoute>
+    ),
+    children: [
+      { index: true, element: <Dashboard /> },
+      { path: "dashboard", element: <Dashboard /> },
+      { path: "profile", element: <Profile /> },
+      { path: "charts", element: <Charts /> },
+      { path: "users", element: <UserManagement /> },
+    ],
+  },
   {
     path: "*",
     element: <Login />,
