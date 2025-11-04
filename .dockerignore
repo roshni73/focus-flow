@@ -1,0 +1,29 @@
+docker buildx build -t focus-flow .# Dependencies
+node_modules
+.pnpm-store
+
+# Build output
+dist
+build
+
+# Version control
+.git
+.gitignore
+
+# Environment variables
+.env
+.env.*
+
+# IDE files
+.vscode
+.idea
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# System files
+.DS_Store
+Thumbs.db
