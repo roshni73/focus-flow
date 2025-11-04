@@ -1,7 +1,6 @@
 @import "tailwindcss";
 
 @theme inline {
-  /* Primary Color Palette - 50 to 900 */
   --color-primary-50: #eff0fe;
   --color-primary-100: #dfe1fd;
   --color-primary-200: #bfc3fb;
@@ -13,7 +12,6 @@
   --color-primary-800: #1f1a56;
   --color-primary-900: #100d2b;
 
-  /* Secondary Color Palette - 50 to 900 */
   --color-secondary-50: #f0efff;
   --color-secondary-100: #e1dfff;
   --color-secondary-200: #c3bfff;
@@ -25,11 +23,9 @@
   --color-secondary-800: #2b2766;
   --color-secondary-900: #151433;
 
-  /* Legacy support - map base colors to 500 */
   --color-primary: #4e42d9;
   --color-secondary: #6c63ff;
 
-  /* Text and Background Colors */
   --color-text: #797979;
   --color-background: #f9fafb;
   --color-dark: #292838;
